@@ -3,9 +3,9 @@
 ) 
 
 ## Ability System
-面向对象编程虽然强大但也有一些缺点，本质上而言，面向对象编程将数据和方法强关联在了一起，程序员不得不面对一个非常臃肿的Class，Class中某些数据和方法是关联的，但并非所有的数据与所有的方法都一一关联，而且在逻辑上，一个类往往拥有很多种能力，在一个Class中加入太多功能会导致可读性和复用性下降。
-本框架设计的初衷就是为了将臃肿的大类拆分成若干个小类（结构体），用若干小类组成一个复杂的类，就像搭积木一样。这样可以增加代码的可读性，降低维护成本，拆分出的小类都是单一职责的，很容易理解。
-我们采用组件设计模式，一个类的能力取决于它有什么样的组件，这样做的好处是比继承更加灵活且高效（继承的虚标会增加开销），而且借助于C++ Template，我们的组件是静态的，即在编译期实现的，不会产生多余的开销，
+面向对象编程虽然强大但也有一些缺点，本质上而言，面向对象编程将数据和方法强关联在了一起，程序员不得不面对一个非常臃肿的Class，Class中某些数据和方法是关联的，但并非所有的数据与所有的方法都一一关联，这就带来了冗余；而且在逻辑上，一个类往往拥有很多种能力，这导致可读性和复用性下降。
+
+本框架设计的初衷就是为了将臃肿的`大类`拆分成若干个`小类`（结构体），用若干单一功能的`小类`组成一个复杂的`大类`，就像搭积木一样。这样可以增加代码的可读性，降低维护成本，拆分出的小类都是单一职责的，容易理解而且可以随意组合。由于采用了组件设计模式，一个类的能力取决于它有什么样的组件，这样做的好处是比继承更加灵活且高效（虚函数会增加开销），而且借助于C++ Template，组件是静态的，即在编译期实现的，不会产生额外的运行时开销，
 
 ## Feature
 1. Header-only, Powerful, Tiny
@@ -15,8 +15,9 @@
 5. Self-explanatory and Easy to read
 
 ## Basic
-本系统主要包含两个模板类，一个是`Ability`，一个是`AbilityContainer`。
+本系统主要包含两个模板类，一个是`Ability`，一个是`AbilityContainer`；以及一个`角色的概念`
 ```
+// Ability System Role
 namespace asr {
     struct A;
     struct B;
@@ -28,8 +29,9 @@ class C: public Ability<asr::C, asr::A> {};
 class ABC: public AbilityContainer<A, B, C> {};
 ```
 - `AbilityContainer`类是`变长模板`的`大类`，由若干`小类`组成，可以接任意个数的小类。
+- `角色`是`小类`的模板参数，可以理解成对于某个功能的命名和抽象，大部分情况下角色就是一个类型声明。
 - `Ability`类是`变长模板`的`小类`，各个`小类`之间有依赖关系，依赖关系由其后面的模板参数决定，第一个表示自己的角色，剩余的表示其依赖的角色，所有至少要一个模板（必须标定自己的角色，可以没有依赖）。
-- `struct B: public Ability<asr::C, asr::A, asr::C>`的含义是：对于B类，它的角色是`B`，它的依赖是`A`和`C`
+- `struct B: public Ability<asr::C, asr::A, asr::C>`的含义是：对于B类，它的角色是`B`，它的依赖是`A`和`C`。
 
 
 ## Quick Start
@@ -81,7 +83,6 @@ struct User {
     std::string sex;
     int age;
 };
-
 
 namespace asr {
     struct Title;
@@ -228,6 +229,8 @@ class Table: public AbilityContainer<ASelect, ADisplay, AKeys, AFilter, AData, A
 ```
 对于每个`Ability`的子类，它们的Ioc顺序是和它们在AbilityContainer中的位置有关的，它会从自己所在位置的后一个开始搜索，一直往后循环一圈（即顺序搜索到最后一个，再跳转到第一个顺序搜索到自己的前一个）。
 对于一个`AbilityContainer`出现相同的角色，比如`AFilter`和`AData`它们的角色都是`asr::Data`，那么那一个生效取决于它们的位置，按照搜索顺序，对于`ASelect` `ADisplay` `AKeys` `ATitle`所有查找到的`asr::Data`，实际上都是`AFilter`，如果更换顺序为 `class Table: public AbilityContainer<ASelect, ADisplay, AFilter, AKeys, AData, ATitle> {};` 那么对于`AKeys`她找到的就是`AData`。
+
+层的概念就是对于`大类`而言，对于同名的角色`Role`
 
 加入Filter后的完整代码如下
 > run it online : [**compiler explorer**](
