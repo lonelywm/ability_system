@@ -15,7 +15,7 @@
 5. Self-explanatory and Easy to read
 
 ## Basic
-本系统主要包含两个模板类，一个是`Ability`，一个是`AbilityContainer`；以及一个`角色的概念`
+本系统主要包含两个模板类：`Ability`、`AbilityContainer`和一个`角色`的概念
 ```
 // Ability System Role
 namespace asr {
