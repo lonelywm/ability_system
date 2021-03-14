@@ -205,7 +205,7 @@ int main() {
 ```
 
 ## 查找顺序和层
-为什么要引入一个中间变量如`asr::Display`，asr命名空间下面的类都只有声明，仅起到标识的作用。但是引入它们是非常有必要的，主要有两个原因，一是为了避免相互引用，A->B && B->A，相互引用相互依赖是可能发生的；第二是为了给系统加入层的概念，举例说明：
+为什么要引入一个中间变量如`asr::Display`，asr命名空间下面的类都只有声明，仅起到标识的作用，但是引入它们是非常有必要的，主要有两个原因，一是为了避免相互引用，A->B && B->A，相互引用相互依赖是可能发生的；第二是为了给系统加入层的概念，举例说明：
 ```
 struct AFilter: public Ability<asr::Data, asr::Data>, public asr::Data {
     std::map<std::string, User> userMapExtra;
@@ -230,7 +230,10 @@ class Table: public AbilityContainer<ASelect, ADisplay, AKeys, AFilter, AData, A
 对于每个`Ability`的子类，它们的Ioc顺序是和它们在AbilityContainer中的位置有关的，它会从自己所在位置的后一个开始搜索，一直往后循环一圈（即顺序搜索到最后一个，再跳转到第一个顺序搜索到自己的前一个）。
 对于一个`AbilityContainer`出现相同的角色，比如`AFilter`和`AData`它们的角色都是`asr::Data`，那么那一个生效取决于它们的位置，按照搜索顺序，对于`ASelect` `ADisplay` `AKeys` `ATitle`所有查找到的`asr::Data`，实际上都是`AFilter`，如果更换顺序为 `class Table: public AbilityContainer<ASelect, ADisplay, AFilter, AKeys, AData, ATitle> {};` 那么对于`AKeys`她找到的就是`AData`。
 
-层的概念就是对于`大类`而言，对于同名的角色`Role`
+### 层
+这里说的层非常类似photeshop中的图层，上面的图层会遮盖下面的图层。
+- 对于`大类`而言，若出现同名的`角色`，只会暴露出最上面的那一个，这个例子中，`大类`只暴露了`AFilter`，而`AData`被隐藏了
+- 层的性质非常适合用虚函数和继承的方式来实现
 
 加入Filter后的完整代码如下
 > run it online : [**compiler explorer**](
