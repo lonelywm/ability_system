@@ -10,3 +10,8 @@ add_executable(ability_system_test
     include/ability_system.h
     test/test.cpp
 )
+
+add_executable(ability_system_test_filter
+    include/ability_system.h
+    test/test_filter.cpp
+)
