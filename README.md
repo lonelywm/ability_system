@@ -227,6 +227,7 @@ struct AFilter: public Ability<asr::Data, asr::Data>, public asr::Data {
 
 class Table: public AbilityContainer<ASelect, ADisplay, AKeys, AFilter, AData, ATitle> {};
 ```
+### 查找顺序
 对于每个`Ability`的子类，它们的Ioc顺序是和它们在AbilityContainer中的位置有关的，它会从自己所在位置的后一个开始搜索，一直往后循环一圈（即顺序搜索到最后一个，再跳转到第一个顺序搜索到自己的前一个）。
 对于一个`AbilityContainer`出现相同的角色，比如`AFilter`和`AData`它们的角色都是`asr::Data`，那么那一个生效取决于它们的位置，按照搜索顺序，对于`ASelect` `ADisplay` `AKeys` `ATitle`所有查找到的`asr::Data`，实际上都是`AFilter`，如果更换顺序为 `class Table: public AbilityContainer<ASelect, ADisplay, AFilter, AKeys, AData, ATitle> {};` 那么对于`AKeys`她找到的就是`AData`。
 
